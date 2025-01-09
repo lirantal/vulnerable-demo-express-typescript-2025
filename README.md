@@ -71,3 +71,60 @@ For a visual guide, watch the [video demo](https://github.com/user-attachments/a
 We'd love to hear your feedback and suggestions for further improvements. Feel free to contribute and join us in making backend development cleaner and faster!
 
 🎉 Happy coding!
+
+## 💀 Hacking TypeScript
+
+### TypeScript Validation Fail #1
+
+In the users controller file at `src/api/user/userController.ts` we have the following code:
+
+```typescript
+class UserController {
+  public getUsers: RequestHandler = async (_req: Request, res: Response) => {
+    const filterQuery: any = _req.query.filter || '';
+
+    console.log(`req.query.filter: ${filterQuery}; typeof: ${typeof filterQuery}`);
+
+    const serviceResponse = await userService.findAll({ filter: filterQuery });
+    return handleServiceResponse(serviceResponse, res);
+  };
+```
+
+Even though we are using TypeScript, we defined the filterQuery as `any` which is the obvious glaring mistake. So upon sending a request to the `/api/users` endpoint with a query parameter `filter` that may not be a string, we get the following to send a response back
+
+```bash
+curl --silent -X 'GET' -H 'accept: application/json' "http://localhost:8080/users?filter[]=A"| jq
+```
+
+### TypeScript Validation Fail #2
+
+In the users controller file at `src/api/user/userController.ts` we have the following code:
+
+```typescript
+class UserController {
+  public getUsers: RequestHandler = async (_req: Request, res: Response) => {
+        const filterQuery: string = _req.query.filter as string || '';
+
+    console.log(`req.query.filter: ${filterQuery}; typeof: ${typeof filterQuery}`);
+
+    const serviceResponse = await userService.findAll({ filter: filterQuery });
+    return handleServiceResponse(serviceResponse, res);
+  };
+```
+
+We have now improved upon the previous code and treat the `filterQuery` as a string.
+
+Next, run the TS compiler to ensure all types are as expected:
+
+```bash
+npx tsc
+```
+
+Let's send a request to see how the server behaves:
+
+```bash
+curl --silent -X 'GET' -H 'accept: application/json' "http://localhost:8080/users?filter[]=A"| jq
+```
+
+Still, we get results back. Even though, supposedly we should only be accepting a string as a filter query and not arrays, per our TypeScript definitions.
+

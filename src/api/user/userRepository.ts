@@ -20,7 +20,12 @@ export const users: User[] = [
 ];
 
 export class UserRepository {
-  async findAllAsync(): Promise<User[]> {
+  async findAllAsync({ filter }: { filter?: string } = {}): Promise<User[]> {
+    if (filter) {
+      console.log({filter});
+      return users.filter((user) => user.name.startsWith(filter));
+    }
+
     return users;
   }
 

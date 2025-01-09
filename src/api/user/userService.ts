@@ -13,9 +13,9 @@ export class UserService {
   }
 
   // Retrieves all users from the database
-  async findAll(): Promise<ServiceResponse<User[] | null>> {
+  async findAll({ filter }: { filter?: string } = {}): Promise<ServiceResponse<User[] | null>> {
     try {
-      const users = await this.userRepository.findAllAsync();
+      const users = await this.userRepository.findAllAsync({ filter });
       if (!users || users.length === 0) {
         return ServiceResponse.failure("No Users found", null, StatusCodes.NOT_FOUND);
       }

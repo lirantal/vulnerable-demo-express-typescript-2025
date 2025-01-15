@@ -93,7 +93,7 @@ class UserController {
 Even though we are using TypeScript, we defined the filterQuery as `any` which is the obvious glaring mistake. So upon sending a request to the `/api/users` endpoint with a query parameter `filter` that may not be a string, we get the following to send a response back
 
 ```bash
-curl --silent -X 'GET' -H 'accept: application/json' "http://localhost:8080/users?filter[]=A"| jq
+curl -X 'GET' -H 'accept: application/json' "http://localhost:8080/users?filter[]=A"| jq
 ```
 
 ### TypeScript Validation Fail #2
@@ -123,8 +123,25 @@ npx tsc
 Let's send a request to see how the server behaves:
 
 ```bash
-curl --silent -X 'GET' -H 'accept: application/json' "http://localhost:8080/users?filter[]=A"| jq
+curl -X 'GET' -H 'accept: application/json' "http://localhost:8080/users?filter[]=A"| jq
 ```
 
 Still, we get results back. Even though, supposedly we should only be accepting a string as a filter query and not arrays, per our TypeScript definitions.
 
+### TypeScript Security Bypass #3
+
+We send in a query parameter that is a string but contains a malicious payload but it gets sanitized correctly per our logic:
+
+```bash
+$ curl -G -X 'GET' -H 'accept: application/json' "http://localhost:8080/users/component" --data-urlencode "name=<img liran"
+
+Bad input detected!
+```
+
+What happens if we update the query string so that the field is to be interpreted as an array instead of a string?
+
+```bash
+$ curl -G -X 'GET' -H 'accept: application/json' "http://localhost:8080/users/component" --data-urlencode "name[]=<img src=x onError=alert(1) />"           
+
+<h1>Hello, <img src=x onError=alert(1) />!</h1>
+```

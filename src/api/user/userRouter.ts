@@ -12,6 +12,7 @@ export const userRouter: Router = express.Router();
 
 userRegistry.register("User", UserSchema);
 
+// route 
 userRegistry.registerPath({
   method: "get",
   path: "/users",
@@ -21,6 +22,9 @@ userRegistry.registerPath({
 
 userRouter.get("/", userController.getUsers);
 
+userRouter.get("/component", userController.getUserHelloComponent);
+
+// route
 userRegistry.registerPath({
   method: "get",
   path: "/users/{id}",

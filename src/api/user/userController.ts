@@ -1,6 +1,7 @@
 import type { Request, RequestHandler, Response } from "express";
 
 import { userService } from "@/api/user/userService";
+import type { UserSettings, NotificationType } from "@/api/user/userService";
 import { handleServiceResponse } from "@/common/utils/httpHandlers";
 
 interface UserComponentQueryString {
@@ -50,6 +51,40 @@ class UserController {
     const serviceResponse = await userService.findById(id);
     return handleServiceResponse(serviceResponse, res);
   };
+
+  public getUserSettings: RequestHandler = async (req: Request, res: Response) => {
+
+    // @TBD
+    // if (a.isAdmin) {
+    //   console.log('also is admin is true')
+    // }
+
+    // if (req.user?.isAdmin) {
+    //   console.log('is admin is true!!!')
+    // }
+
+    const userSettings = await userService.getUserSettingsForUser(req.params.id);
+    return handleServiceResponse(userSettings, res);
+
+
+  }
+
+  public setUserSettings: RequestHandler = async (req: Request, res: Response) => {
+    const userSettings: UserSettings = req.body;
+    await userService.setUserSettingsForUser(req.params.id, userSettings);
+    return res.status(201).send("User settings updated successfully")
+  }
+
+  public setUserNotificationSetting: RequestHandler = async (req: Request, res: Response) => {
+    const userId: string = req.params.id;
+    const notificationType: NotificationType = req.body.notificationType;
+    const notificationMode: string = req.body.notificationMode;
+    const notificationModeValue: string | boolean = req.body.notificationModeValue;
+
+    await userService.setUserNotificationSetting(userId, notificationType, notificationMode, notificationModeValue);
+    return res.status(201).send("User notification setting updated successfully");
+  }
+
 }
 
 function sanitizeXSS(name: string): boolean {

@@ -21,8 +21,11 @@ userRegistry.registerPath({
 });
 
 userRouter.get("/", userController.getUsers);
-
 userRouter.get("/component", userController.getUserHelloComponent);
+userRouter.get("/:id/settings", userController.getUserSettings);
+userRouter.post("/:id/settings", userController.setUserSettings);
+userRouter.put("/:id/settings/notifications", userController.setUserNotificationSetting);
+
 
 // route
 userRegistry.registerPath({

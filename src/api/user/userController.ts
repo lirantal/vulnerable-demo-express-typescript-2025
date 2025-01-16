@@ -32,12 +32,6 @@ class UserController {
   public getUserHelloComponent: RequestHandler = async (_req: Request<{}, {}, {}, UserComponentQueryString>, res: Response) => {
     const userName = _req.query.name || "World";
 
-    console.log(_req.url);
-    console.log(new URL(_req.url, "http://localhost:3000"));
-    console.log(new URLSearchParams(new URL(_req.url, "http://localhost:3000").search));
-
-    console.log(_req.query);
-
     if (!sanitizeXSS(userName)) {
       return res.status(400).send("Bad input detected!");
     }
@@ -53,15 +47,6 @@ class UserController {
   };
 
   public getUserSettings: RequestHandler = async (req: Request, res: Response) => {
-
-    // @TBD
-    // if (a.isAdmin) {
-    //   console.log('also is admin is true')
-    // }
-
-    // if (req.user?.isAdmin) {
-    //   console.log('is admin is true!!!')
-    // }
 
     const userSettings = await userService.getUserSettingsForUser(req.params.id);
     return handleServiceResponse(userSettings, res);

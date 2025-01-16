@@ -1,5 +1,6 @@
 import cors from "cors";
 import express, { type Express } from "express";
+import session from "express-session";
 import helmet from "helmet";
 import { pino } from "pino";
 
@@ -23,6 +24,19 @@ app.use(express.urlencoded({ extended: true }));
 app.use(cors({ origin: env.CORS_ORIGIN, credentials: true }));
 app.use(helmet());
 app.use(rateLimiter);
+app.use(
+  session({
+    secret: "SUPER_SECRET_SESSION_KEY",
+    resave: false,
+    saveUninitialized: false,
+    cookie: {
+      secure: env.NODE_ENV === "production",
+      sameSite: "strict",
+      httpOnly: true,
+      maxAge: 1000 * 60 * 60 * 24 * 3,
+    },
+  })
+);
 
 // Request logging
 app.use(requestLogger);
@@ -30,6 +44,12 @@ app.use(requestLogger);
 // Routes
 app.use("/health-check", healthCheckRouter);
 app.use("/users", userRouter);
+app.use("/admin", (req, res) => {
+    if (req.session.isAdmin) {
+        return res.send("Hello, Admin!");
+    }
+    return res.status(401).send("Unauthorized");
+})
 
 // Swagger UI
 app.use(openAPIRouter);

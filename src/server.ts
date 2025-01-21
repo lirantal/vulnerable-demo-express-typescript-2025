@@ -44,7 +44,7 @@ app.use(requestLogger);
 // Routes
 app.use("/health-check", healthCheckRouter);
 app.use("/users", userRouter);
-app.use("/admin", (req, res) => {
+app.get("/admin", (req, res) => {
     if (req.session.isAdmin) {
         return res.send("Hello, Admin!");
     }

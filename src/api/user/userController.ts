@@ -1,3 +1,4 @@
+import { z } from 'zod';
 import type { Request, RequestHandler, Response } from "express";
 
 import { userService } from "@/api/user/userService";
@@ -61,12 +62,23 @@ class UserController {
   }
 
   public setUserNotificationSetting: RequestHandler = async (req: Request, res: Response) => {
-    const userId: string = req.params.id;
-    const notificationType: NotificationType = req.body.notificationType;
-    const notificationMode: string = req.body.notificationMode;
-    const notificationModeValue: string | boolean = req.body.notificationModeValue;
+    // Define the schema
+    const notificationSchema = z.object({
+      notificationType: z.string(),
+      notificationMode: z.string(),
+      notificationModeValue: z.union([z.string(), z.boolean()]),
+    });
 
-    await userService.setUserNotificationSetting(userId, notificationType, notificationMode, notificationModeValue);
+    // Validate the schema
+    const validationResult = notificationSchema.safeParse(req.body);
+    if (!validationResult.success) {
+      return res.status(400).json({ error: validationResult.error.errors });
+    }
+
+    const { notificationType, notificationMode, notificationModeValue } = validationResult.data;
+    const userId: string = req.params.id;
+
+    await userService.setUserNotificationSetting(userId, notificationType as NotificationType, notificationMode, notificationModeValue);
     return res.status(201).send("User notification setting updated successfully");
   }
 

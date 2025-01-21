@@ -168,6 +168,12 @@ Now let's specifically set the notifications settings
 curl -X PUT -H 'Content-Type: application/json' http://localhost:8080/users/1/settings/notifications -d '{"notificationType": "email", "notificationMode": "daily", "notificationModeValue": "disabled"}'
 ```
 
+Now let's try to type juggle the notifications settings and cause some havoc on the server
+
+```bash
+curl -X PUT -H 'Content-Type: application/json' http://localhost:8080/users/1/settings/notifications -d '{"notificationType": {"type": "email"}, "notificationMode": ["daily"], "notificationModeValue": "disabled"}'
+```
+
 Now let's abuse this with a prototype pollution payload:
 
 ```bash

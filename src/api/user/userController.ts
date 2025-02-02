@@ -11,8 +11,8 @@ interface UserComponentQueryString {
 
 class UserController {
   public getUsers: RequestHandler = async (_req: Request, res: Response) => {
-    // 1: try this first, declaring filterQuery as 'any'
-    // const filterQuery: any = _req.query.filter || '';
+    // 1: try this first, declaring filterQuery as 'unknown'
+    // const filterQuery: unknown = _req.query.filter || '';
 
     // 2: then, we improve to this variation which declares the query filter
     // as a string which is what we expect
@@ -30,6 +30,7 @@ class UserController {
   // 4: another option is to define an interface for the query string
   // and use it across the controller, service and repository as needed. this also casts
   // the query string input to the expected type (but of course fails to actually validate or enforce it at runtime)
+  // public getUserHelloComponent: RequestHandler = async (_req: Request<{},{},{}, {name?: string} >, res: Response) => {
   public getUserHelloComponent: RequestHandler = async (_req: Request<{}, {}, {}, UserComponentQueryString>, res: Response) => {
     const userName = _req.query.name || "World";
 

@@ -185,3 +185,30 @@ Let's try to access the admin route now:
 ```bash
 curl http://localhost:8080/admin
 ```
+
+### TypeScript Security Bypass #5
+
+Let's save user information
+
+First need to initialize an SQLite database
+
+```sh
+npm run initdb
+```
+
+Then we can refer to the `userController.ts` file which has a `saveUser` route handler that uses Zod to validate the schema and also relies on TypeScript to infer the User type.
+
+Let's update:
+
+```bash
+curl -X POST -H 'Content-Type: application/json' http://localhost:8080/users/1/profile -d '{"name": "Liran", "email": "liran@example.com", "age": 30}'
+```
+
+Here's where it goes wrong. What about the following payload:
+
+```sh
+curl -X POST -H 'Content-Type: application/json' http://localhost:8080/users/1/profile -d '{"name": "Liran", "email": "liran@example.com", "age": 30, "role": "admin"}'
+```
+
+The Zod schema is not strictly enforced and that results in the extra property `role` being saved to the database. This is a mass assignment vulnerability.
+

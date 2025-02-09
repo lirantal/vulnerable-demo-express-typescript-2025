@@ -5,6 +5,25 @@ import { UserRepository } from "@/api/user/userRepository";
 import { ServiceResponse } from "@/common/models/serviceResponse";
 import { logger } from "@/server";
 
+import { eq } from "drizzle-orm";
+import { drizzle } from 'drizzle-orm/better-sqlite3';
+// import { BetterSQLite3Database } from 'drizzle-orm/better-sqlite3';
+import Database from 'better-sqlite3';
+
+// Initialize and connect to the SQLite database
+const sqlite = new Database('database.sqlite');
+const db = drizzle({ client: sqlite });
+
+import { sqliteTable, integer, text } from 'drizzle-orm/sqlite-core';
+// Define the users table schema
+const usersTable = sqliteTable('users', {
+  id: integer('id').primaryKey({ autoIncrement: true }),
+  name: text('name').notNull(),
+  email: text('email').notNull().unique(),
+  age: integer('age').notNull(),
+  role: text('role').notNull(),
+});
+
 const settingsDefault = {
   darkmode: false,
   notifications: {
@@ -61,6 +80,23 @@ export class UserService {
       );
     }
   }
+
+// Save user information to the database
+async saveUser(user: User): Promise<ServiceResponse<User | null>> {
+  try {
+    const result = await db.update(usersTable)
+      .set(user)
+      .where(eq(usersTable.id, 1));
+
+    if (!result || result.changes === 0) {
+      return ServiceResponse.failure("User not found", null, StatusCodes.INTERNAL_SERVER_ERROR);
+    }
+
+    return ServiceResponse.success<User>("User found", user);
+  } catch (error) {
+    return ServiceResponse.failure("An error occurred while finding user settings.", null, StatusCodes.INTERNAL_SERVER_ERROR);
+  }
+}
 
   // Retrieves a single user by their ID
   async findById(id: number): Promise<ServiceResponse<User | null>> {

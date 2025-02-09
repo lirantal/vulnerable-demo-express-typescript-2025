@@ -3,6 +3,8 @@ import type { Request, RequestHandler, Response } from "express";
 
 import { userService } from "@/api/user/userService";
 import type { UserSettings, NotificationType } from "@/api/user/userService";
+import type { User } from "@/api/user/userModel";
+import { UserSchema } from "@/api/user/userModel";
 import { handleServiceResponse } from "@/common/utils/httpHandlers";
 
 interface UserComponentQueryString {
@@ -47,6 +49,23 @@ class UserController {
     const serviceResponse = await userService.findById(id);
     return handleServiceResponse(serviceResponse, res);
   };
+
+  public saveUser: RequestHandler = async (req: Request, res: Response) => {
+
+    // Validate the schema
+    const userObject = req.body;
+    userObject.id = Number.parseInt(req.params.id, 10);
+    const validationResult = UserSchema.safeParse(userObject);
+
+    // If the validation fails, return a 400 response with the error
+    if (!validationResult.success) {
+      return res.status(400).json({ error: validationResult.error.errors });
+    }
+
+    const user: User = userObject;
+    const serviceResponse = await userService.saveUser(user);
+    return handleServiceResponse(serviceResponse, res);
+  }
 
   public getUserSettings: RequestHandler = async (req: Request, res: Response) => {
 

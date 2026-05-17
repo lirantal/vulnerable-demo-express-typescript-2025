@@ -212,3 +212,7 @@ curl -X POST -H 'Content-Type: application/json' http://localhost:8080/users/1/p
 
 The Zod schema is not strictly enforced and that results in the extra property `role` being saved to the database. This is a mass assignment vulnerability.
 
+
+## Contributing
+
+Please consult [CONTRIBUTING](./CONTRIBUTING.md) for guidelines on contributing to this project.

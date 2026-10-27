@@ -1,10 +1,9 @@
-import { z } from 'zod';
 import type { Request, RequestHandler, Response } from "express";
-
-import { userService } from "@/api/user/userService";
-import type { UserSettings, NotificationType } from "@/api/user/userService";
+import { z } from "zod";
 import type { User } from "@/api/user/userModel";
 import { UserSchema } from "@/api/user/userModel";
+import type { NotificationType, UserSettings } from "@/api/user/userService";
+import { userService } from "@/api/user/userService";
 import { handleServiceResponse } from "@/common/utils/httpHandlers";
 
 interface UserComponentQueryString {
@@ -18,7 +17,7 @@ class UserController {
 
     // 2: then, we improve to this variation which declares the query filter
     // as a string which is what we expect
-    const filterQuery: string = _req.query.filter as string || '';
+    const filterQuery: string = (_req.query.filter as string) || "";
 
     console.log(`req.query.filter: ${filterQuery}; typeof: ${typeof filterQuery}`);
 
@@ -33,7 +32,10 @@ class UserController {
   // and use it across the controller, service and repository as needed. this also casts
   // the query string input to the expected type (but of course fails to actually validate or enforce it at runtime)
   // public getUserHelloComponent: RequestHandler = async (_req: Request<{},{},{}, {name?: string} >, res: Response) => {
-  public getUserHelloComponent: RequestHandler = async (_req: Request<{}, {}, {}, UserComponentQueryString>, res: Response) => {
+  public getUserHelloComponent: RequestHandler = async (
+    _req: Request<{}, {}, {}, UserComponentQueryString>,
+    res: Response,
+  ) => {
     const userName = _req.query.name || "World";
 
     if (!sanitizeXSS(userName)) {
@@ -42,7 +44,7 @@ class UserController {
 
     const helloComponent = `<h1>Hello, ${userName}!</h1>`;
     return res.send(helloComponent);
-  }
+  };
 
   public getUser: RequestHandler = async (req: Request, res: Response) => {
     const id = Number.parseInt(req.params.id as string, 10);
@@ -51,7 +53,6 @@ class UserController {
   };
 
   public saveUser: RequestHandler = async (req: Request, res: Response) => {
-
     // Validate the schema
     const userObject = req.body;
     userObject.id = Number.parseInt(req.params.id, 10);
@@ -65,21 +66,18 @@ class UserController {
     const user: User = userObject;
     const serviceResponse = await userService.saveUser(user);
     return handleServiceResponse(serviceResponse, res);
-  }
+  };
 
   public getUserSettings: RequestHandler = async (req: Request, res: Response) => {
-
     const userSettings = await userService.getUserSettingsForUser(req.params.id);
     return handleServiceResponse(userSettings, res);
-
-
-  }
+  };
 
   public setUserSettings: RequestHandler = async (req: Request, res: Response) => {
     const userSettings: UserSettings = req.body;
     await userService.setUserSettingsForUser(req.params.id, userSettings);
-    return res.status(201).send("User settings updated successfully")
-  }
+    return res.status(201).send("User settings updated successfully");
+  };
 
   public setUserNotificationSetting: RequestHandler = async (req: Request, res: Response) => {
     // Define the schema
@@ -98,10 +96,14 @@ class UserController {
     const { notificationType, notificationMode, notificationModeValue } = validationResult.data;
     const userId: string = req.params.id;
 
-    await userService.setUserNotificationSetting(userId, notificationType as NotificationType, notificationMode, notificationModeValue);
+    await userService.setUserNotificationSetting(
+      userId,
+      notificationType as NotificationType,
+      notificationMode,
+      notificationModeValue,
+    );
     return res.status(201).send("User notification setting updated successfully");
-  }
-
+  };
 }
 
 function sanitizeXSS(name: string): boolean {

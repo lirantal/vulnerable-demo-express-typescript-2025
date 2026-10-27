@@ -1,9 +1,8 @@
 import { OpenAPIRegistry } from "@asteasolutions/zod-to-openapi";
 import express, { type Router } from "express";
 import { z } from "zod";
-
-import { createApiResponse } from "@/api-docs/openAPIResponseBuilders";
 import { GetUserSchema, UserSchema } from "@/api/user/userModel";
+import { createApiResponse } from "@/api-docs/openAPIResponseBuilders";
 import { validateRequest } from "@/common/utils/httpHandlers";
 import { userController } from "./userController";
 
@@ -12,7 +11,7 @@ export const userRouter: Router = express.Router();
 
 userRegistry.register("User", UserSchema);
 
-// route 
+// route
 userRegistry.registerPath({
   method: "get",
   path: "/users",
@@ -26,7 +25,6 @@ userRouter.get("/:id/settings", userController.getUserSettings);
 userRouter.post("/:id/settings", userController.setUserSettings);
 userRouter.put("/:id/settings/notifications", userController.setUserNotificationSetting);
 userRouter.post("/:id/profile", userController.saveUser);
-
 
 // route
 userRegistry.registerPath({

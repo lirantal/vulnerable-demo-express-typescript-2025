@@ -3,10 +3,9 @@ import express, { type Express } from "express";
 import session from "express-session";
 import helmet from "helmet";
 import { pino } from "pino";
-
-import { openAPIRouter } from "@/api-docs/openAPIRouter";
 import { healthCheckRouter } from "@/api/healthCheck/healthCheckRouter";
 import { userRouter } from "@/api/user/userRouter";
+import { openAPIRouter } from "@/api-docs/openAPIRouter";
 import errorHandler from "@/common/middleware/errorHandler";
 import rateLimiter from "@/common/middleware/rateLimiter";
 import requestLogger from "@/common/middleware/requestLogger";
@@ -35,7 +34,7 @@ app.use(
       httpOnly: true,
       maxAge: 1000 * 60 * 60 * 24 * 3,
     },
-  })
+  }),
 );
 
 // Request logging
@@ -45,11 +44,11 @@ app.use(requestLogger);
 app.use("/health-check", healthCheckRouter);
 app.use("/users", userRouter);
 app.get("/admin", (req, res) => {
-    if (req.session.isAdmin) {
-        return res.send("Hello, Admin!");
-    }
-    return res.status(401).send("Unauthorized");
-})
+  if (req.session.isAdmin) {
+    return res.send("Hello, Admin!");
+  }
+  return res.status(401).send("Unauthorized");
+});
 
 // Swagger UI
 app.use(openAPIRouter);

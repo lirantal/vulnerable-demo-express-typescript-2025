@@ -2,9 +2,8 @@
   "compilerOptions": {
     "target": "ESNext",
     "module": "CommonJS",
-    "baseUrl": ".",
     "paths": {
-      "@/*": ["src/*"]
+      "@/*": ["./src/*"]
     },
     "moduleResolution": "Node",
     "outDir": "dist",
@@ -13,7 +12,7 @@
     "esModuleInterop": true,
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
-    "types": ["vitest/globals"],
+    "types": ["vitest/globals"]
   },
   "include": ["src/**/*"],
   "exclude": ["node_modules"]

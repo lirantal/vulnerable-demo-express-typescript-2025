@@ -9,18 +9,21 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
 
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
 
-      # Login step only executed for pushes to main
+      # Login step only executed for pushes to master
       - name: Login to GitHub Container Registry
         if: github.ref == 'refs/heads/master'
         uses: docker/login-action@650006c6eb7dba73a995cc03b0b2d7f5ca915bee # v4.2.0
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
-          password: ${{ secrets.GH_Token }}
+          password: ${{ secrets.GITHUB_TOKEN }}
 
       # Build and tag the production Docker image
       - name: Build the Docker image

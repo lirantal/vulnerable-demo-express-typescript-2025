@@ -19,6 +19,8 @@ jobs:
           node-version-file: '.nvmrc'
           cache: "npm"
 
+      - name: Set up pinned npm
+        run: bash "${{ github.workspace }}/.github/scripts/setup-npm.sh"
       - name: Install Dependencies
         run: npm ci
 
